@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>OSLO | студия звукозаписи</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            color: #fff;
+            line-height: 1.5;
+            overflow-x: hidden;
+            background-color: #0a0a0a;
+        }
+
+        /* ---- Vanta.js контейнер (вместо видео) ---- */
+        #vanta-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.6;
+        }
+
+        /* ---- эффект шума поверх vanta ---- */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJmIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc0IiBudW1PY3RhdmVzPSIzIiAvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNmKSIgb3BhY2l0eT0iMC4wMiIgLz48L3N2Zz4=');
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 1;
+            mix-blend-mode: overlay;
+        }
+
+        /* ---- градиентный оверлей для читаемости ---- */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ---- контент поверх ---- */
+        .content {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ---- навигация ---- */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 8px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .logo span {
+            color: #a0a0a0;
+            font-weight: 300;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            color: #b0b0b0;
+            text-decoration: none;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.4s ease;
+            font-weight: 300;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #fff;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* ---- hero секция ---- */
+        .hero {
+            padding: 60px 0 100px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 60px;
+        }
+
+        .hero-label {
+            font-size: 12px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #808080;
+            margin-bottom: 20px;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 10vw, 6rem);
+            font-weight: 300;
+            line-height: 1;
+            margin-bottom: 25px;
+            color: #fff;
+            max-width: 900px;
+            letter-spacing: -1px;
+        }
+
+        .hero-title span {
+            color: transparent;
+            -webkit-text-stroke: 1px #fff;
+        }
+
+        .hero-description {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            max-width: 500px;
+            margin-bottom: 40px;
+            color: #b0b0b0;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 45px;
+            text-decoration: none;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-size: 12px;
+            transition: all 0.4s ease;
+            border: none;
+            cursor: pointer;
+            background: transparent;
+            border: 1px solid #fff;
+            color: #fff;
+        }
+
+        .btn:hover {
+            background: #fff;
+            color: #0a0a0a;
+            letter-spacing: 5px;
+        }
+
+        /* ---- секции общие ---- */
+        .section {
+            padding: 70px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            scroll-margin-top: 80px;
+        }
+
+        .section-header {
+            margin-bottom: 50px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #808080;
+            margin-bottom: 10px;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 300;
+            color: #fff;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+        }
+
+        .section-subtitle {
+            max-width: 500px;
+            color: #b0b0b0;
+            font-size: 1rem;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        /* ---- грид студий ---- */
+        .studios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .studio-card {
+            background: rgba(20,20,20,0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.03);
+            padding: 35px;
+            transition: all 0.5s ease;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .studio-card:hover {
+            background: rgba(30,30,30,0.5);
+            border-color: rgba(255,255,255,0.1);
+            transform: translateY(-5px);
+        }
+
+        .studio-card:nth-child(1) { animation-delay: 0.1s; }
+        .studio-card:nth-child(2) { animation-delay: 0.2s; }
+        .studio-card:nth-child(3) { animation-delay: 0.3s; }
+
+        .studio-title {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 15px;
+            color: #fff;
+            letter-spacing: 2px;
+        }
+
+        .studio-specs {
+            font-size: 13px;
+            color: #808080;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .studio-desc {
+            color: #b0b0b0;
+            font-size: 14px;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        /* ---- оборудование (переделал полностью) ---- */
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .equip-item {
+            background: rgba(15,15,15,0.8);
+            backdrop-filter: blur(4px);
+            padding: 25px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .equip-item:hover {
+            background: rgba(30,30,30,0.9);
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .equip-name {
+            font-size: 16px;
+            font-weight: 400;
+            color: #fff;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .equip-brand {
+            font-size: 12px;
+            color: #808080;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 900px) {
+            .equipment-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .equipment-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* ---- контакты (минимал) ---- */
+        .contacts-minimal {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .contact-block {
+            background: rgba(20,20,20,0.3);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.03);
+            padding: 30px;
+        }
+
+        .contact-block h4 {
+            color: #808080;
+            font-size: 12px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .contact-block p {
+            color: #fff;
+            font-size: 18px;
+            line-height: 1.5;
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+
+        .contact-block .small {
+            font-size: 13px;
+            color: #808080;
+        }
+
+        /* ---- футер ---- */
+        .footer {
+            padding: 50px 0 30px;
+            margin-top: auto;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #606060;
+            font-size: 12px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .developer {
+            background: rgba(255,255,255,0.02);
+            padding: 6px 15px;
+            border-radius: 30px;
+        }
+
+        .developer a {
+            color: #a0a0a0;
+            text-decoration: none;
+            border-bottom: 1px dotted #404040;
+        }
+
+        /* ---- анимации ---- */
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ---- модальное окно ---- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            position: relative;
+            background: #111;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 50px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            z-index: 1001;
+            animation: modalFade 0.4s ease;
+        }
+
+        .modal-icon {
+            font-size: 60px;
+            color: #404040;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 300;
+            color: #fff;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .modal-text {
+            font-size: 14px;
+            color: #808080;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 12px 40px;
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: #fff;
+            color: #0a0a0a;
+        }
+
+        @keyframes modalFade {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Vanta.js фон (дымка/волны) -->
+    <div id="vanta-bg"></div>
+    <div class="overlay"></div>
+    <div class="noise"></div>
+
+    <!-- модальное окно -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content">
+            <div class="modal-icon">⚡</div>
+            <h3 class="modal-title">запись временно</h3>
+            <p class="modal-text">Бронирование студий работает по телефону. Позвоните или напишите нам.</p>
+            <button class="modal-close" id="closeModal">хорошо</button>
+        </div>
+    </div>
+
+    <!-- основной контент -->
+    <div class="content">
+        <!-- навигация -->
+        <nav class="navbar">
+            <div class="logo">OSLO<span>.</span></div>
+            <div class="nav-links">
+                <a href="#studios" class="active">студии</a>
+                <a href="#equipment">оборудование</a>
+                <a href="#contacts">контакты</a>
+            </div>
+        </nav>
+
+        <!-- hero -->
+        <section class="hero">
+            <div class="hero-label">студия звукозаписи</div>
+            <h1 class="hero-title">Звук, <span>в который</span> веришь</h1>
+            <p class="hero-description">
+                Три студии с аналоговым и цифровым оборудованием. Тёплый ламповый звук и полная изоляция.
+            </p>
+            <div class="hero-buttons">
+                <button class="btn" id="bookButton">записаться</button>
+                <a href="#studios" class="btn">студии</a>
+            </div>
+        </section>
+
+        <!-- студии -->
+        <section id="studios" class="section">
+            <div class="section-header">
+                <div class="section-label">пространство</div>
+                <h2 class="section-title">Студии</h2>
+                <p class="section-subtitle">Каждая комната спроектирована акустиками из Европы</p>
+            </div>
+            
+            <div class="studios-grid">
+                <div class="studio-card">
+                    <div class="studio-title">STUDIO A</div>
+                    <div class="studio-specs">API 1608 · 48 каналов</div>
+                    <div class="studio-desc">Основная студия для записи групп и оркестров. Высота потолков 5 метров, естественная реверберация.</div>
+                </div>
+                
+                <div class="studio-card">
+                    <div class="studio-title">STUDIO B</div>
+                    <div class="studio-specs">Neve 5088 · 24 канала</div>
+                    <div class="studio-desc">Вокальная и продакшн-студия. Ламповые микрофоны, винтажные компрессоры.</div>
+                </div>
+                
+                <div class="studio-card">
+                    <div class="studio-title">MASTERING</div>
+                    <div class="studio-specs">Maselec · Prism Sound</div>
+                    <div class="studio-desc">Отдельная комната для мастеринга. Мониторы B&W 800 Diamond.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- оборудование (переделал полностью, без иконок) -->
+        <section id="equipment" class="section">
+            <div class="section-header">
+                <div class="section-label">техника</div>
+                <h2 class="section-title">Оборудование</h2>
+                <p class="section-subtitle">Винтаж и современная классика</p>
+            </div>
+
+            <div class="equipment-grid">
+                <div class="equip-item">
+                    <div class="equip-name">U 87 Ai</div>
+                    <div class="equip-brand">Neumann</div>
+                </div>
+                <div class="equip-item">
+                    <div class="equip-name">C 12 VR</div>
+                    <div class="equip-brand">AKG</div>
+                </div>
+                <div class="equip-item">
+                    <div class="equip-name">ELA M 251</div>
+                    <div class="equip-brand">Telefunken</div>
+                </div>
+                <div class="equip-item">
+                    <div class="equip-name">SM7B</div>
+                    <div class="equip-brand">Shure</div>
+                </div>
+                <div class="equip-item">
+                    <div class="equip-name">1176 LN</div>
+                    <div class="equip-brand">Universal Audio</div>
+                </div>
+                <div class="equip-item">
+                    <div class="equip-name">LA-2A</div>
+                    <div class="equip-brand">Teletronix</div>
+                </div>
+                <div class="equip-item">
+                    <div class="equip-name">Blue Stripe</div>
+                    <div class="equip-brand">Pultec</div>
+                </div>
+                <div class="equip-item">
+                    <div class="equip-name">A80</div>
+                    <div class="equip-brand">Studer</div>
+                </div>
+                <div class="equip-item">
+                    <div class="equip-name">192</div>
+                    <div class="equip-brand">B&W</div>
+                </div>
+                <div class="equip-item">
+                    <div class="equip-name">NS-10M</div>
+                    <div class="equip-brand">Yamaha</div>
+                </div>
+                <div class="equip-item">
+                    <div class="equip-name">MPX-1</div>
+                    <div class="equip-brand">Lexicon</div>
+                </div>
+                <div class="equip-item">
+                    <div class="equip-name">Space Echo</div>
+                    <div class="equip-brand">Roland</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- контакты -->
+        <section id="contacts" class="section">
+            <div class="section-header">
+                <div class="section-label">связь</div>
+                <h2 class="section-title">Контакты</h2>
+                <p class="section-subtitle">Работаем каждый день без выходных</p>
+            </div>
+
+            <div class="contacts-minimal">
+                <div class="contact-block">
+                    <h4>📍 адрес</h4>
+                    <p>Минск, пр. Победителей 75/1</p>
+                    <p class="small">вход с улицы</p>
+                </div>
+                <div class="contact-block">
+                    <h4>📞 телефон</h4>
+                    <p>+375 (29) 555-27-32</p>
+                    <p class="small">с 11:00 до 23:00</p>
+                </div>
+                <div class="contact-block">
+                    <h4>✉️ email</h4>
+                    <p>oslostudio@gmail.com</p>
+                    <p class="small">ответ в течение часа</p>
+                </div>
+<div class="contact-block">
+    <h4>🅿️ парковка</h4>
+    <p>Гостевые места во дворе</p>
+    <p class="small">шлагбаум, позвоните нам</p>
+</div>
+            </div>
+        </section>
+
+        <!-- футер -->
+        <footer class="footer">
+            <div class="footer-bottom">
+                <div>© 2025 OSLO RECORDING STUDIO</div>
+                <div class="developer">разработка сайта — <a href="#">Nexus.by</a></div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- скрипты -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.waves.min.js"></script>
+    
+    <script>
+        // VANTAA JS - WAVES (дымка, движение)
+        VANTA.WAVES({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x333333,
+            shininess: 30.00,
+            waveHeight: 0.15,
+            waveSpeed: 0.75,
+            zoom: 1.2
+        });
+
+        // модальное окно
+        const modal = document.getElementById('bookingModal');
+        const bookButton = document.getElementById('bookButton');
+        const closeButton = document.getElementById('closeModal');
+        const overlay = document.getElementById('modalOverlay');
+
+        function openModal() {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        bookButton.addEventListener('click', openModal);
+        closeButton.addEventListener('click', closeModal);
+        overlay.addEventListener('click', closeModal);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // подсветка активного меню
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-links a');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (pageYOffset >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
